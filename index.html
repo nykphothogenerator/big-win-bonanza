@@ -1,0 +1,357 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>The Big Win Bonanza</title>
+
+<style>
+* {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    font-family: Arial, sans-serif;
+    background: #f4f7f5;
+    color: #222;
+}
+
+header {
+    background: linear-gradient(135deg, #d71920, #9b0000);
+    color: white;
+    text-align: center;
+    padding: 25px 15px;
+}
+
+header h1 {
+    margin: 0;
+    font-size: 28px;
+}
+
+header p {
+    margin: 8px 0 0;
+}
+
+.container {
+    max-width: 700px;
+    margin: auto;
+    padding: 15px;
+}
+
+.card {
+    background: white;
+    border-radius: 15px;
+    padding: 18px;
+    margin-bottom: 15px;
+    box-shadow: 0 3px 12px rgba(0,0,0,0.08);
+}
+
+button {
+    border: none;
+    border-radius: 10px;
+    padding: 13px 18px;
+    font-size: 16px;
+    cursor: pointer;
+}
+
+.primary {
+    background: #d71920;
+    color: white;
+}
+
+input {
+    width: 100%;
+    padding: 13px;
+    margin: 7px 0 12px;
+    border: 1px solid #ccc;
+    border-radius: 9px;
+    font-size: 16px;
+}
+
+.prize {
+    border: 1px solid #ddd;
+    border-radius: 12px;
+    padding: 12px;
+    margin: 10px 0;
+    background: #fff;
+}
+
+.prize img {
+    width: 100%;
+    max-height: 220px;
+    object-fit: contain;
+    border-radius: 10px;
+    margin-top: 8px;
+}
+
+.prize-number {
+    font-weight: bold;
+    font-size: 18px;
+}
+
+.admin {
+    display: none;
+}
+
+.small {
+    color: #666;
+    font-size: 14px;
+}
+
+.danger {
+    background: #dc3545;
+    color: white;
+    margin-top: 8px;
+}
+
+</style>
+</head>
+
+<body>
+
+<header>
+    <h1>🎁 THE BIG WIN BONANZA</h1>
+    <p>MEGA LUCKY DRAW</p>
+</header>
+
+<div class="container">
+
+    <div class="card">
+        <h2>📝 Register Now</h2>
+
+        <input id="name" type="text" placeholder="Enter your name">
+
+        <button class="primary" onclick="registerUser()">
+            REGISTER
+        </button>
+
+        <p id="registerMessage"></p>
+    </div>
+
+
+    <div class="card">
+        <h2>🆔 My ID</h2>
+        <p id="myId">Not registered yet.</p>
+    </div>
+
+
+    <div class="card">
+        <h2>🏆 PRIZE LIST</h2>
+        <div id="prizeList"></div>
+    </div>
+
+
+    <div class="card">
+        <h2>🔐 ADMIN</h2>
+
+        <button class="primary" onclick="showAdmin()">
+            ADMIN PANEL
+        </button>
+
+        <div class="admin" id="adminPanel">
+
+            <hr>
+
+            <h3>➕ Add Prize</h3>
+
+            <input id="prizeName" placeholder="Prize name">
+
+            <input id="prizeImage"
+                   placeholder="Prize photo URL">
+
+            <button class="primary" onclick="addPrize()">
+                ADD PRIZE
+            </button>
+
+            <h3>🗑️ Delete Prize</h3>
+
+            <input id="deleteId"
+                   type="number"
+                   placeholder="Enter prize number">
+
+            <button class="danger" onclick="deletePrize()">
+                DELETE
+            </button>
+
+            <p class="small">
+                Admin functions are only for testing in this first version.
+            </p>
+
+        </div>
+    </div>
+
+</div>
+
+
+<script>
+
+let prizes = JSON.parse(localStorage.getItem("prizes")) || [];
+
+let user = JSON.parse(localStorage.getItem("user")) || null;
+
+
+// REGISTER
+function registerUser() {
+
+    const name = document.getElementById("name").value.trim();
+
+    if (!name) {
+        alert("Please enter your name.");
+        return;
+    }
+
+    const id = Math.floor(100000 + Math.random() * 900000);
+
+    user = {
+        name: name,
+        id: id
+    };
+
+    localStorage.setItem("user", JSON.stringify(user));
+
+    document.getElementById("registerMessage").innerHTML =
+        "✅ Registered successfully!";
+
+    showUser();
+}
+
+
+// SHOW USER ID
+function showUser() {
+
+    if (user) {
+
+        document.getElementById("myId").innerHTML =
+            "👤 Name: <b>" + user.name + "</b><br>" +
+            "🆔 ID: <b>" + user.id + "</b>";
+
+    }
+}
+
+
+// ADD PRIZE
+function addPrize() {
+
+    const name =
+        document.getElementById("prizeName").value.trim();
+
+    const image =
+        document.getElementById("prizeImage").value.trim();
+
+    if (!name) {
+        alert("Enter prize name.");
+        return;
+    }
+
+    const id = prizes.length + 1;
+
+    prizes.push({
+        id: id,
+        name: name,
+        image: image
+    });
+
+    localStorage.setItem("prizes", JSON.stringify(prizes));
+
+    document.getElementById("prizeName").value = "";
+    document.getElementById("prizeImage").value = "";
+
+    displayPrizes();
+
+    alert("Prize added successfully!");
+}
+
+
+// DELETE PRIZE
+function deletePrize() {
+
+    const id =
+        Number(document.getElementById("deleteId").value);
+
+    if (!id) {
+        alert("Enter prize number.");
+        return;
+    }
+
+    prizes = prizes.filter(prize => prize.id !== id);
+
+    localStorage.setItem("prizes", JSON.stringify(prizes));
+
+    displayPrizes();
+
+    alert("Prize deleted.");
+}
+
+
+// DISPLAY PRIZES
+function displayPrizes() {
+
+    const list =
+        document.getElementById("prizeList");
+
+    list.innerHTML = "";
+
+    if (prizes.length === 0) {
+
+        list.innerHTML =
+            "<p>🎁 No prizes have been added yet.</p>";
+
+        return;
+    }
+
+    prizes.forEach(prize => {
+
+        let html =
+            '<div class="prize">' +
+
+            '<div class="prize-number">' +
+            '🏆 ' + prize.id + '. ' +
+            prize.name +
+            '</div>';
+
+        if (prize.image) {
+
+            html +=
+                '<img src="' +
+                prize.image +
+                '" alt="' +
+                prize.name +
+                '">';
+
+        }
+
+        html += '</div>';
+
+        list.innerHTML += html;
+
+    });
+}
+
+
+// ADMIN PANEL
+function showAdmin() {
+
+    const password =
+        prompt("Enter admin password:");
+
+    if (password === "1234") {
+
+        document.getElementById("adminPanel").style.display =
+            "block";
+
+    } else {
+
+        alert("❌ Wrong password.");
+
+    }
+}
+
+
+showUser();
+displayPrizes();
+
+</script>
+
+</body>
+</html>
